@@ -17,30 +17,19 @@ from rich.prompt import Prompt, Confirm
 
 console = Console()
 
-
-def _get_client() -> anthropic.Anthropic:
-    """APIクライアントを取得（Secrets対応）"""
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        try:
-            import streamlit as st
-            api_key = st.secrets["ANTHROPIC_API_KEY"]
-        except Exception:
-            pass
-    if api_key:
-        return anthropic.Anthropic(api_key=api_key)
-    return anthropic.Anthropic()
-
-
-# 遅延初期化（Streamlit Cloud でSecretsが読めるタイミングで初期化）
-_client = None
+# Streamlit Secrets → 環境変数にセット（Streamlit Cloud対応）
+if not os.environ.get("ANTHROPIC_API_KEY"):
+    try:
+        import streamlit as st
+        if "ANTHROPIC_API_KEY" in st.secrets:
+            os.environ["ANTHROPIC_API_KEY"] = str(st.secrets["ANTHROPIC_API_KEY"])
+    except Exception:
+        pass
 
 
 def get_client() -> anthropic.Anthropic:
-    global _client
-    if _client is None:
-        _client = _get_client()
-    return _client
+    """APIクライアントを取得"""
+    return anthropic.Anthropic()
 
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 MODEL = "claude-sonnet-4-20250514"
