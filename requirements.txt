@@ -1,0 +1,6 @@
+anthropic
+pillow
+python-dotenv
+pyyaml
+rich
+streamlit

@@ -1,0 +1,13 @@
+[project]
+name = "lp-agent"
+version = "0.1.0"
+description = "LP制作エージェント - 競合リサーチからワイヤーフレーム提案まで"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic",
+    "pillow",
+    "python-dotenv",
+    "pyyaml",
+    "rich",
+    "streamlit",
+]
