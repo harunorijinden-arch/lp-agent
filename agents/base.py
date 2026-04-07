@@ -30,8 +30,8 @@ _api_key = str(_api_key).strip()
 def get_client() -> anthropic.Anthropic:
     """APIクライアントを取得"""
     if _api_key:
-        return anthropic.Anthropic(api_key=_api_key)
-    return anthropic.Anthropic()
+        return anthropic.Anthropic(api_key=_api_key, timeout=600.0)
+    return anthropic.Anthropic(timeout=600.0)
 
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 MODEL_SONNET = "claude-sonnet-4-20250514"

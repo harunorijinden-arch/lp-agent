@@ -421,10 +421,24 @@ if next_step <= 7:
             st.warning(f"Step {next_step - 1} の結果がありません。先に前のステップを完了してください。")
             st.stop()
 
-    if st.button(f"🚀 Step {next_step} を実行", use_container_width=True, type="primary"):
+    col_single, col_all = st.columns(2)
+    with col_single:
+        single_run = st.button(f"🚀 Step {next_step} を実行", use_container_width=True, type="primary")
+    with col_all:
+        all_run = st.button(f"⚡ Step {next_step}〜7 を連続実行", use_container_width=True)
+
+    if single_run:
         with st.spinner(f"{info['icon']} Step {next_step}: {info['name']} を実行中... しばらくお待ちください"):
             run_step(next_step)
             st.session_state.current_step = next_step
+        st.rerun()
+
+    if all_run:
+        for s in range(next_step, 8):
+            s_info = STEPS[s]
+            with st.spinner(f"{s_info['icon']} Step {s}: {s_info['name']} を実行中... ({s}/7)"):
+                run_step(s)
+                st.session_state.current_step = s
         st.rerun()
 
     # 戻るボタン
