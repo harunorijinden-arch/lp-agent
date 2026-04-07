@@ -17,18 +17,20 @@ from rich.prompt import Prompt, Confirm
 
 console = Console()
 
-# Streamlit Secrets → 環境変数にセット（Streamlit Cloud対応）
-if not os.environ.get("ANTHROPIC_API_KEY"):
-    try:
-        import streamlit as st
-        if "ANTHROPIC_API_KEY" in st.secrets:
-            os.environ["ANTHROPIC_API_KEY"] = str(st.secrets["ANTHROPIC_API_KEY"])
-    except Exception:
-        pass
+# APIキー取得
+_api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+try:
+    import streamlit as st
+    _api_key = st.secrets.get("ANTHROPIC_API_KEY", _api_key)
+except Exception:
+    pass
+_api_key = str(_api_key).strip()
 
 
 def get_client() -> anthropic.Anthropic:
     """APIクライアントを取得"""
+    if _api_key:
+        return anthropic.Anthropic(api_key=_api_key)
     return anthropic.Anthropic()
 
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
