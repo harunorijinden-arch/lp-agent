@@ -6,7 +6,7 @@ LP分析に特化。参照資料なし。Web検索あり。
 - Step2: 別業界LPリサーチ（参考LP + 追加4つ以上）
 """
 
-from agents.base import call_claude, load_prompt, console
+from agents.base import call_claude, load_prompt, console, MODEL_HAIKU
 from rich.panel import Panel
 
 TOTAL_STEPS = 7
@@ -69,7 +69,7 @@ class ResearcherAgent:
         if images:
             prompt += "\n\n【添付画像】競合LPのスクリーンショットなど参考画像も分析に活用してください。"
 
-        return call_claude(SYSTEM_COMPETITOR, prompt, use_web_search=True, images=images)
+        return call_claude(SYSTEM_COMPETITOR, prompt, use_web_search=True, images=images, model=MODEL_HAIKU)
 
     def run_cross_industry(self, industry: str, base_url: str, who_what: str = "", images: list[bytes] | None = None) -> str:
         """Step3: 別業界LPリサーチ（Who/What定義を踏まえてリサーチ）"""
@@ -91,4 +91,4 @@ class ResearcherAgent:
         if images:
             prompt += "\n\n【添付画像】参考LPのスクリーンショットなど参考画像も分析に活用してください。"
 
-        return call_claude(SYSTEM_CROSS_INDUSTRY, prompt, use_web_search=True, images=images)
+        return call_claude(SYSTEM_CROSS_INDUSTRY, prompt, use_web_search=True, images=images, model=MODEL_HAIKU)

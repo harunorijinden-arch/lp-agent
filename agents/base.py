@@ -34,7 +34,9 @@ def get_client() -> anthropic.Anthropic:
     return anthropic.Anthropic()
 
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
-MODEL = "claude-sonnet-4-20250514"
+MODEL_SONNET = "claude-sonnet-4-20250514"
+MODEL_HAIKU = "claude-haiku-4-5-20251001"
+MODEL = MODEL_SONNET  # デフォルト
 
 # ── バッチモード（非対話） ──
 _batch_mode = False
@@ -110,11 +112,12 @@ def call_claude(
     use_web_search: bool = False,
     max_tokens: int = 16000,
     images: list[bytes] | None = None,
+    model: str | None = None,
 ) -> str:
     """Claude APIを呼び出す（Web検索ツール付き・画像対応）"""
     content = _build_content_with_images(user_message, images)
     kwargs = {
-        "model": MODEL,
+        "model": model or MODEL,
         "max_tokens": max_tokens,
         "system": system_prompt,
         "messages": [{"role": "user", "content": content}],

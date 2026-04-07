@@ -7,7 +7,7 @@
 
 from pathlib import Path
 
-from agents.base import call_claude, load_prompt, save_output, console, is_batch_mode
+from agents.base import call_claude, load_prompt, save_output, console, is_batch_mode, MODEL_HAIKU
 from rich.panel import Panel
 from rich.markdown import Markdown
 from rich.prompt import Prompt
@@ -121,7 +121,7 @@ class DiscussionAgent:
                 .replace("{round_theme}", ROUND_THEMES[i])
             )
 
-            result = call_claude(system, prompt, use_web_search=False, max_tokens=MAX_TOKENS)
+            result = call_claude(system, prompt, use_web_search=False, max_tokens=MAX_TOKENS, model=MODEL_HAIKU)
 
             save_output(f"step6_ラウンド{round_num}.md", result, project_dir)
             all_rounds.append(f"## ラウンド{round_num}\n\n{result}")
@@ -203,4 +203,4 @@ class DiscussionAgent:
             "```\n"
         )
 
-        return call_claude(system, prompt, use_web_search=False, max_tokens=8000)
+        return call_claude(system, prompt, use_web_search=False, max_tokens=8000, model=MODEL_HAIKU)
