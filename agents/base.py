@@ -17,16 +17,30 @@ from rich.prompt import Prompt, Confirm
 
 console = Console()
 
-# APIキー: 環境変数 or Streamlit Secrets
-_api_key = os.environ.get("ANTHROPIC_API_KEY")
-if not _api_key:
-    try:
-        import streamlit as st
-        _api_key = st.secrets.get("ANTHROPIC_API_KEY")
-    except Exception:
-        pass
 
-client = anthropic.Anthropic(api_key=_api_key) if _api_key else anthropic.Anthropic()
+def _get_client() -> anthropic.Anthropic:
+    """APIクライアントを取得（Secrets対応）"""
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        try:
+            import streamlit as st
+            api_key = st.secrets["ANTHROPIC_API_KEY"]
+        except Exception:
+            pass
+    if api_key:
+        return anthropic.Anthropic(api_key=api_key)
+    return anthropic.Anthropic()
+
+
+# 遅延初期化（Streamlit Cloud でSecretsが読めるタイミングで初期化）
+_client = None
+
+
+def get_client() -> anthropic.Anthropic:
+    global _client
+    if _client is None:
+        _client = _get_client()
+    return _client
 
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 MODEL = "claude-sonnet-4-20250514"
@@ -125,7 +139,7 @@ def call_claude(
         ]
 
     all_text = []
-    response = client.messages.create(**kwargs)
+    response = get_client().messages.create(**kwargs)
 
     while response.stop_reason == "tool_use":
         for block in response.content:
@@ -137,7 +151,7 @@ def call_claude(
             {"role": "assistant", "content": response.content},
             {"role": "user", "content": [{"type": "text", "text": "続けてください。"}]},
         ]
-        response = client.messages.create(**kwargs)
+        response = get_client().messages.create(**kwargs)
 
     for block in response.content:
         if block.type == "text":
